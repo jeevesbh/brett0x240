@@ -7,6 +7,7 @@ import (
 	"math/big"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 type EtherscanResponse struct {
@@ -65,8 +66,9 @@ func convertToHumanReadable(totalSupply *big.Int, decimals int) string {
 
 func supplyHandler(w http.ResponseWriter, r *http.Request) {
 	// Set address and API key
-	contractAddress := "0x240D6FAF8c3B1A7394e371792A3bf9D28DD65515"
 	apiKey := os.Getenv("ETHERSCAN_API_KEY")
+	contractAddress := os.Getenv("TOKEN_ADDRESS")
+	decimalsStr := os.Getenv("TOKEN_DECIMALS")
 
 	totalSupplyRaw, err := fetchTotalSupply(contractAddress, apiKey)
 	if err != nil {
@@ -74,8 +76,10 @@ func supplyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// token's decimals
-	decimals := 9
+	decimals, err := strconv.Atoi(decimalsStr)
+	if err != nil {
+		log.Fatalf("Error converting TOKEN_DECIMALS to integer: %v", err)
+	}
 
 	humanReadableTotalSupply := convertToHumanReadable(totalSupplyRaw, decimals)
 
