@@ -16,14 +16,6 @@ type EtherscanResponse struct {
 	Result  string `json:"result"`
 }
 
-type TokenDetailsResponse struct {
-	Status  string `json:"status"`
-	Message string `json:"message"`
-	Result  struct {
-		Decimals string `json:"decimals"`
-	} `json:"result"`
-}
-
 const etherscanAPIURL = "https://api.etherscan.io/api"
 
 func fetchTotalSupply(contractAddress, apiKey string) (*big.Int, error) {
@@ -87,8 +79,42 @@ func supplyHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(humanReadableTotalSupply))
 }
 
+func circulatingSupplyHandler(w http.ResponseWriter, r *http.Request) {
+	// apiKey := os.Getenv("ETHERSCAN_API_KEY")
+	// contractAddress := os.Getenv("TOKEN_ADDRESS")
+	// decimalsStr := os.Getenv("TOKEN_DECIMALS")
+
+	// totalSupplyRaw, err := fetchTotalSupply(contractAddress, apiKey)
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
+
+	// lockedTokens, burnedTokens, err := fetchLockedAndBurnedTokens()
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
+
+	// circulatingSupply := new(big.Int).Sub(totalSupplyRaw, lockedTokens)
+	// circulatingSupply.Sub(circulatingSupply, burnedTokens)
+
+	// decimals, err := strconv.Atoi(decimalsStr)
+	// if err != nil {
+	// 	log.Fatalf("Error converting TOKEN_DECIMALS to integer: %v", err)
+	// }
+
+	// humanReadableCirculatingSupply := convertToHumanReadable(circulatingSupply, decimals)
+	humanReadableCirculatingSupply := "68622706.146"
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(humanReadableCirculatingSupply))
+}
+
 func main() {
 	http.HandleFunc("/supply", supplyHandler)
+	http.HandleFunc("/circulating-supply", circulatingSupplyHandler)
+
 	log.Println("Server running on port 8080")
 	log.Fatal(http.ListenAndServe("0.0.0.0:8080", nil))
 }
